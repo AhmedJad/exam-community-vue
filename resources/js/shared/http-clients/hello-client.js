@@ -12,4 +12,7 @@ export default {
     getHellos(pageNo,pageSize,text) {
         return axios.get(`${BASE_URL}?page=${pageNo}&page_size=${pageSize}&text=${text}`);
     },
+    getAllHellos(){
+        return axios.get(`${BASE_URL}`);
+    }
 }

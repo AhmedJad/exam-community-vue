@@ -6,8 +6,14 @@ use Illuminate\Http\Request;
 
 class PagesController extends Controller
 {
-    public function index()
+    public function admin()
     {
-        return view('welcome');
+        return view('admin');
     }
+    
+    public function web()
+    {
+        return view('web');
+    }
+    
 }

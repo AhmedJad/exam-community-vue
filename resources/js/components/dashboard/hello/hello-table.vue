@@ -1,84 +1,97 @@
 <template>
   <div class="p-3 hellos-container">
     <DeleteConfirmation @confirm="deleteHello" @closed="selectedHello = null" />
-    <HelloForm
-      @created="onCreated"
-      @updated="onUpdated"
-      :selectedHello="selectedHello"
-    />
-    <div class="controls">
-      <div class="search">
-        <input
-          @keyup="search"
-          v-model="text"
-          type="text"
-          :placeholder="$t('SEARCH')"
-          ref="search"
-        />
-        <i class="fa fa-search"></i>
-      </div>
-      <div class="actions my-2">
-        <button
-          @click="onAddClicked()"
-          data-toggle="modal"
-          data-target="#helloFormModal"
-          class="border text-secondary"
-        >
-          <i class="fa fa-plus" aria-hidden="true"></i>
-        </button>
-        <button @click="downloadExcelFile" class="border text-secondary">
-          <i class="fa fa-download" aria-hidden="true"></i>
-        </button>
+    <HelloForm @created="onCreated" @updated="onUpdated" :selectedHello="selectedHello" />
+    <div class="header">
+      <h2 class="welcome">
+        <b>{{ $t("HELLO") }}</b
+        >, {{ $t("WELCOME_HERE") }}
+      </h2>
+      <div class="title">
+        <router-link to="/admin-panel-settings">{{ $t("HOME") }}</router-link>
+        /
+        <span>{{ $t("HELLO") }}</span>
       </div>
     </div>
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">{{ $t("IMAGE") }}</th>
-            <th scope="col">{{ $t("TITLE") }}</th>
-            <th scope="col">{{ $t("TITLE") }}</th>
-            <th scope="col">{{ $t("ACTIONS") }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(hello, index) in hellos" :key="hello.id">
-            <td><img :src="hello.image" /></td>
-            <td>{{ hello.title_ar }}</td>
-            <td>{{ hello.title_en }}</td>
-            <td>
-              <div class="actions">
+    <div class="px-4">
+      <div class="table-container">
+          <div class="table-responsive">
+            <div class="controls">
+              <div class="search">
+                <input
+                  v-model="text"
+                  type="text"
+                  :placeholder="$t('SEARCH')"
+                  ref="search"
+                />
+                <i class="fa fa-search"></i>
+              </div>
+              <div class="actions my-2">
                 <button
-                  @click="onEditClicked(hello, index)"
+                  @click="onAddClicked()"
                   data-toggle="modal"
                   data-target="#helloFormModal"
                   class="border text-secondary"
                 >
-                  <i class="fa fa-edit" aria-hidden="true"></i>
+                  <i class="fa fa-plus" aria-hidden="true"></i>
                 </button>
-                <button
-                  @click="onDeleteClicked(hello, index)"
-                  data-toggle="modal"
-                  data-target="#deleteConfirmationModal"
-                  class="border text-secondary"
-                >
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button @click="downloadExcelFile" class="border text-secondary">
+                  <i class="fa fa-download" aria-hidden="true"></i>
+                </button>
+                <button @click="print" class="border text-secondary">
+                  <i class="fa fa-print" aria-hidden="true"></i>
                 </button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-1">
-      <paginate
-        v-model="page"
-        :pageCount="pageCounts"
-        :clickHandler="getHellos"
-        :prevText="$t('PREV')"
-        :nextText="$t('NEXT')"
-      >
-      </paginate>
+            </div>
+            <table id="printMe" class="table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ $t("IMAGE") }}</th>
+                  <th scope="col">{{ $t("TITLE") }}</th>
+                  <th scope="col">{{ $t("TITLE") }}</th>
+                  <th class="actions-header" scope="col">{{ $t("ACTIONS") }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(hello, index) in hellos" :key="hello.id">
+                  <td><img :src="hello.image" /></td>
+                  <td>{{ hello.title_ar }}</td>
+                  <td>{{ hello.title_en }}</td>
+                  <td class="actions-cell">
+                    <div class="actions">
+                      <button
+                        @click="onEditClicked(hello, index)"
+                        data-toggle="modal"
+                        data-target="#helloFormModal"
+                        class="border text-secondary"
+                      >
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        @click="onDeleteClicked(hello, index)"
+                        data-toggle="modal"
+                        data-target="#deleteConfirmationModal"
+                        class="border text-secondary"
+                      >
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <div class="mt-1">
+          <paginate
+            v-model="page"
+            :pageCount="pageCounts"
+            :clickHandler="getHellos"
+            :prevText="$t('PREV')"
+            :nextText="$t('NEXT')"
+          >
+          </paginate>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -89,7 +102,7 @@ import exportFromJSON from "export-from-json";
 import DeleteConfirmation from "../../../shared/components/delete-confirmation.vue";
 import HelloForm from "./hello-form.vue";
 import helloStore from "./hello-store";
-import { inject, provide, reactive, toRefs } from "vue-demi";
+import { inject, provide, reactive, ref, toRefs, watch } from "vue-demi";
 import { useI18n } from "vue-i18n";
 export default {
   components: {
@@ -99,7 +112,7 @@ export default {
   },
   setup() {
     const data = reactive({
-      pageSize: 10,
+      pageSize: 6,
       page: 1,
       hellos: [],
       text: "",
@@ -146,30 +159,33 @@ export default {
         });
     }
     function downloadExcelFile() {
-      const _data = data.hellos;
-      const fileName = "Hellos";
-      const exportType = exportFromJSON.types.csv;
-      if (_data) exportFromJSON({ _data, fileName, exportType });
+      helloClient.getAllHellos().then((res) => {
+        let data = res.data;
+        const fileName = "Hellos";
+        const exportType = exportFromJSON.types.csv;
+        if (data) exportFromJSON({ data, fileName, exportType });
+      });
+    }
+    function print() {
+      window.print();
     }
     function onCreated(event) {
-      data.hellos.unshift(event);
+      data.page = 1;
+      getHellos();
     }
     function onUpdated(event) {
-      data.hellos[data.selectedHelloIndex] = event;
       data.selectedHello = null;
+      getHellos();
     }
     function deleteHello() {
       helloClient
         .delete(data.selectedHello.id)
         .then((response) => {
           toast.success(t("DELETED_SUCCESSFULLY"));
-          data.hellos.splice(data.index, 1);
-          if (data.hellos.length == 0) {
-            if (data.page > 1) {
-              data.page--;
-            }
-            getHellos();
+          if (data.page > 1) {
+            data.page--;
           }
+          getHellos();
           data.selectedHello = null;
         })
         .catch((error) => {});
@@ -182,6 +198,15 @@ export default {
         getHellos();
       }, 500);
     }
+    watch(
+      () => {
+        data.text;
+      },
+      (value) => {
+        search();
+      },
+      { deep: true }
+    );
     //Commons
     function created() {
       getHellos();
@@ -197,12 +222,31 @@ export default {
       onUpdated,
       deleteHello,
       search,
+      print,
     };
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printMe,
+  #printMe * {
+    visibility: visible;
+  }
+  .actions-header,
+  .actions-cell {
+    display: none !important;
+  }
+  #printMe {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
 .hellos-container {
   td {
     img {
@@ -214,50 +258,100 @@ export default {
         rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     }
   }
-  .controls {
+  .header {
+    * {
+      font-size: 17px !important;
+    }
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    @media (max-width: 500px) {
-      flex-direction: column;
+    padding: 30px;
+    .welcome {
+      padding-top: 9px;
     }
-    body[dir="ltr"] & {
-      .search {
-        i {
-          right: 25px;
+    .title {
+      * {
+        color: #6c757d !important;
+      }
+      a {
+        text-decoration: none;
+        color: #868e96 !important;
+        &:hover {
+          color: #6c757d !important;
         }
       }
     }
-    body[dir="rtl"] & {
+  }
+  .table-container {
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgb(0 0 0 / 10%);
+    padding: 30px;
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      @media (max-width: 500px) {
+        flex-direction: column;
+      }
+      body[dir="ltr"] & {
+        .search {
+          i {
+            right: 25px;
+          }
+        }
+      }
+      body[dir="rtl"] & {
+        .search {
+          i {
+            left: 25px;
+          }
+        }
+      }
       .search {
+        margin-bottom: 10px;
         i {
-          left: 25px;
+          position: relative;
+          top: 1px;
+          color: #888888;
+        }
+        input {
+          padding: 4px 15px;
+          border: 1px solid #dee2e6 !important;
+          border-radius: 5px;
         }
       }
     }
-    .search {
-      margin-bottom: 10px;
-      i {
-        position: relative;
-        top: 1px;
-        color: #888888;
+    .actions {
+      display: flex;
+      a:hover {
+        cursor: text;
       }
-      input {
-        padding: 8px 15px;
-        border: 1px solid #dee2e6 !important;
+      button {
+        width: 34px;
+        height: 34px;
+        background: none;
+        margin: 3px 5px;
         border-radius: 5px;
       }
     }
-  }
-  .actions {
-    button {
-      width: 30px;
-      height: 30px;
-      background: none;
-      margin: 3px 5px;
+    a:hover {
+      cursor: pointer;
     }
-  }
-  a:hover {
-    cursor: pointer;
+    .active {
+      a {
+        color: #fff !important;
+        background-color: #6d85fb !important;
+        border-color: #dbdbdb !important;
+      }
+    }
+    .page-link {
+      padding: 3px 18px !important;
+    }
+    table {
+      td,
+      th {
+        width: 25%;
+      }
+    }
   }
 }
 </style>

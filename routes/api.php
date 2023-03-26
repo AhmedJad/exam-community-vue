@@ -35,8 +35,39 @@ Route::prefix("hellos")->group(function () {
     Route::get("", "HelloController@index");
 });
 
+Route::prefix("many-image")->group(function () {
+    Route::post("", "ManyImageController@store");
+    Route::post("update", "ManyImageController@update");
+    Route::post("add-image", "ManyImageController@addImage");
+    Route::delete("delete-image", "ManyImageController@deleteImage");
+    Route::delete("{id}", "ManyImageController@delete");
+    Route::get("", "ManyImageController@index");
+});
+
 Route::prefix("chat")->group(function () {
     Route::get("rooms", "ChatController@getRooms");
     Route::get("messages/{roomId}", "ChatController@getMessages");
     Route::post("", "ChatController@newMesage");
+});
+
+Route::prefix("folders")->group(function () {
+    Route::post("", "FolderController@store");
+    Route::post("update", "FolderController@update");
+    Route::delete("{id}", "FolderController@delete");
+    Route::get("", "FolderController@index");
+});
+
+
+Route::prefix("exams")->group(function () {
+    Route::post("", "ExamAdminController@store");
+    Route::post("update", "ExamAdminController@update");
+    Route::delete("{id}", "ExamAdminController@delete");
+    Route::get("", "ExamAdminController@index");
+});
+
+Route::prefix("exam-solutions")->group(function () {
+    Route::get("", "ExamSolutionController@index");
+    Route::post("solve", "ExamSolutionController@solve");
+    Route::get("folders", "ExamSolutionController@getFolders");
+    Route::get("exams", "ExamSolutionController@getExams");
 });

@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreHelloRequest;
 use App\Http\Requests\UpdateHelloRequest;
 use App\Models\Hello;
-use App\Repositories\HelloRepository;
 use Illuminate\Support\Facades\Storage;
 
 class HelloController extends Controller
 {
-    public function __construct(HelloRepository $helloRepository)
+    public function __construct()
     {
         $this->middleware('auth');
     }
@@ -49,10 +48,13 @@ class HelloController extends Controller
     public function index()
     {
         $text = isset(request()->text) ? request()->text : '';
-        return Hello::whereRaw('LOWER(`title_ar`) LIKE ? or LOWER(`title_en`) LIKE ?', [
-            "%" . strtolower($text) . '%',
-            "%" . strtolower($text) . '%',
-        ])->paginate(request()->page_size);
+        if(request()->page_size){
+            return Hello::whereRaw('LOWER(`title_ar`) LIKE ? or LOWER(`title_en`) LIKE ?', [
+                "%" . strtolower($text) . '%',
+                "%" . strtolower($text) . '%',
+            ])->orderBy("id","desc")->paginate(request()->page_size);
+        }
+        return Hello::get();
     }
     //Commons    
     public function _update($helloInput)

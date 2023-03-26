@@ -28,8 +28,14 @@ export default {
             store.dir = locale.value == "ar" ? "rtl" : "ltr";
             if (lang == "ar") {
                 $("#body").attr("dir", "rtl");
+                $("#core-style").attr("href", "/assets/vendor/css/core-rtl.css");
+                $("#default-style").attr("href", "/assets/vendor/css/theme-default-rtl.css");
+                $("#demo-style").attr("href", "/assets/css/demo-rtl.css");
             } else if (lang == "en") {
                 $("#body").attr("dir", "ltr");
+                $("#core-style").attr("href", "/assets/vendor/css/core.css");
+                $("#default-style").attr("href", "/assets/vendor/css/theme-default.css");
+                $("#demo-style").attr("href", "/assets/css/demo.css");
             }
         }
         return { changeLang };

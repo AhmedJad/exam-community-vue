@@ -65,7 +65,6 @@ export default {
         getMessages();
         Echo.connector.options.auth.headers["Authorization"] =
           "Bearer " + TokenUtil.get();
-          
         window.Echo.private("chat." + form.room_id).listen(".private-chat-event", (e) => {
           getMessages();
         });

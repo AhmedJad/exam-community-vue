@@ -24,7 +24,7 @@ export default {
           .getCurrentUser()
           .then((response) => {
             store.currentUser = response.data;
-          })
+          })  
           .catch((error) => {
             console.log("err", error.response);
           });

@@ -15,8 +15,7 @@ export default {
     getUser() {
         return {
             id: this.payload().id,
-            first_name: this.payload().first_name,
-            last_name: this.payload().last_name,
+            name: this.payload().name,
             phone: this.payload().phone,
             address: this.payload().address,
             city: this.payload().city,

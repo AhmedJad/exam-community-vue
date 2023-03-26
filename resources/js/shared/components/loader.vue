@@ -5,7 +5,7 @@
     :height="height"
     :active="showLoader"
     :can-cancel="canCancel"
-    :is-full-page="fullPage"
+    :is-full-page="fullPage"  
   ></Loading>
 </template>
 <script>

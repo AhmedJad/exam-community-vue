@@ -40,14 +40,15 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $user = User::create($request->input());
-        $verificationCode = Str::random(5);
-        $this->createEmailVerification([
-            "email" => $request->email,
-            "verification_code" => $verificationCode,
-        ]);
-        Mail::to($user->email)->send(new EmailVerification($verificationCode));
+        // $verificationCode = Str::random(5);
+        // $this->createEmailVerification([
+        //     "email" => $request->email,
+        //     "verification_code" => $verificationCode,
+        // ]);
+        // Mail::to($user->email)->send(new EmailVerification($verificationCode));
         return $this->login($request);
     }
+
     public function verifyEmail(EmailVerificationRequest $request)
     {
         $authUserEmail = JWTAuth::parseToken()->getPayload()->get("email");

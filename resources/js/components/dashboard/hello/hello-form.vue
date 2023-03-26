@@ -198,7 +198,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-danger">
                 {{ $t("SUBMIT") }}
               </button>
               <button
@@ -441,12 +441,14 @@ export default {
     }
   }
   .increments {
-    display: inline-block;
-    width: 30px;
+    font-size: 16px !important;
+    justify-content: center;
+    display: flex;
+    width: 37px;
     text-align: center;
     background-color: #f8f9fa;
     border-radius: 5px;
-    padding: 5px;
+    align-items: center;
   }
   .modal-footer {
     button {
